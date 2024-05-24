@@ -1,0 +1,35 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - voice_rsa (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - voice_rsa (from `.symlinks/plugins/voice_rsa/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  voice_rsa:
+    :path: ".symlinks/plugins/voice_rsa/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: 13825b8a9334a850581300559b8839134b124670
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  voice_rsa: cec6aeaf1ec7701ab479b45bd9e01b24d5e53ce4
+
+PODFILE CHECKSUM: 6e700dec67e6deac9b1c69bb14c49a2217a12d15
+
+COCOAPODS: 1.15.2
