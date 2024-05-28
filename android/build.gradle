@@ -36,11 +36,21 @@ android {
     defaultConfig {
         minSdkVersion 19
     }
-
-    dependencies {
-        testImplementation 'junit:junit:4.13.2'
-        testImplementation 'org.mockito:mockito-core:5.0.0'
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
+    packagingOptions{
+        doNotStrip "*/*/libvad.dnn.so"
+        doNotStrip "*/*/libbd_easr_s1_merge_normal_20151216.dat.so"
+    }
+
+//    dependencies {
+//        testImplementation 'junit:junit:4.13.2'
+//        testImplementation 'org.mockito:mockito-core:5.0.0'
+//    }
 
     testOptions {
         unitTests.all {
@@ -51,4 +61,8 @@ android {
             }
         }
     }
+}
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.0.2'
 }
