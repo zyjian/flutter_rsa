@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    saveFileFromAssetsToCache('assets/$audioPath', audioPath).then((value) =>initPlatformState() );
+    saveFileFromAssetsToCache('assets/test.pcm', audioPath);
 
   }
 
@@ -35,14 +35,21 @@ class _MyAppState extends State<MyApp> {
     // Read file from assets
     ByteData data = await rootBundle.load(assetFileName);
     List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-
     // Get cache directory
     Directory cacheDir = await getTemporaryDirectory();
     String cacheFilePath = '${cacheDir.path}/$cacheFileName';
-
     // Write file to cache directory
     await File(cacheFilePath).writeAsBytes(bytes);
     print('File saved to cache: $cacheFilePath');
+
+    try {
+
+      var result =
+      await _voiceRsaPlugin.getPlatformVersion();
+      print(result);
+    } catch(e) {
+      print(e);
+    }
   }
 
 

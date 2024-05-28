@@ -34,4 +34,8 @@ abstract class VoiceRsaPlatform extends PlatformInterface {
   Future<int?> requestAuthorization() {
     throw UnimplementedError('requestAuthorization() has not been implemented.');
   }
+
+  Future<String?> getPlatformVersion() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
 }

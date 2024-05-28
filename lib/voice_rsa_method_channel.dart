@@ -23,4 +23,9 @@ class MethodChannelVoiceRsa extends VoiceRsaPlatform {
   Future<int?> requestAuthorization() async {
     return methodChannel.invokeMethod<int>('requestAuthorization');
   }
+
+  Future<String?> getPlatformVersion() async{
+    return methodChannel.invokeMethod<String>('getPlatformVersion');
+  }
+
 }
