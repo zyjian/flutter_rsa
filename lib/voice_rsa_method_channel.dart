@@ -10,8 +10,9 @@ class MethodChannelVoiceRsa extends VoiceRsaPlatform {
   final methodChannel = const MethodChannel('voice_rsa');
 
   @override
-  Future<Map<String, dynamic>?> getVoiceAsr(String path) async {
-    return methodChannel.invokeMapMethod<String,dynamic>('getVoiceAsr', {'path': path});
+  Future<Map<String, dynamic>?> getVoiceAsr(String path,{Map<String,dynamic>? params}) async {
+    params=params??{};
+    return methodChannel.invokeMapMethod<String,dynamic>('getVoiceAsr', {'path': path,...params});
   }
 
   @override

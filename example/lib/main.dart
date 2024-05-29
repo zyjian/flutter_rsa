@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:voice_rsa/voice_rsa.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
-const audioPath = 'test.mp3';
 
 void main() {
   runApp(const MyApp());
@@ -27,25 +27,45 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    saveFileFromAssetsToCache('assets/test.pcm', audioPath);
+    saveFileFromAssetsToCache('assets/test.pcm');
 
   }
 
-  Future<void> saveFileFromAssetsToCache(String assetFileName, String cacheFileName) async {
+  Future<void> saveFileFromAssetsToCache(String assetFileName) async {
     // Read file from assets
     ByteData data = await rootBundle.load(assetFileName);
     List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     // Get cache directory
     Directory cacheDir = await getTemporaryDirectory();
-    String cacheFilePath = '${cacheDir.path}/$cacheFileName';
+    String cacheFilePath = '${cacheDir.path}/test.pcm';
     // Write file to cache directory
-    await File(cacheFilePath).writeAsBytes(bytes);
+    var file = await File(cacheFilePath).writeAsBytes(bytes);
+    print(file);
     print('File saved to cache: $cacheFilePath');
 
+  }
+  Future<void> requestPermission() async {
+    if (await Permission.microphone.request().isGranted) {
+      // Either the permission was already granted before or the user just granted it.
+      print('Microphone permission granted');
+    } else {
+      print('Microphone permission not granted');
+    }
+  }
+  void onTest() async{
+    await requestPermission();
     try {
-
+      Directory cacheDir = await getTemporaryDirectory();
+      String cacheFilePath = '${cacheDir.path}/test.pcm';
+      // var result =
+      //     await _voiceRsaPlugin.getPlatformVersion();
       var result =
-      await _voiceRsaPlugin.getPlatformVersion();
+      await _voiceRsaPlugin.getVoiceAsr(cacheFilePath,params: {
+        'appid':'8747719',
+        'key':'H4DeZw1Pim1xzfAhMOXwf5ex7ZcGjO96',
+        'secret':'jbeEKNLGN8C4NllfKGCYpzKHCVVGo2GY',
+        'infile':cacheFilePath,
+      });
       print(result);
     } catch(e) {
       print(e);
@@ -66,11 +86,11 @@ class _MyAppState extends State<MyApp> {
         print(result);
       }
 
-      var result =
-          await _voiceRsaPlugin.getVoiceAsr(audioPath);
-      if(result != null){
-        platformVersion = result['message']??'';
-      }
+      // var result =
+      //     await _voiceRsaPlugin.getVoiceAsr(audioPath);
+      // if(result != null){
+      //   platformVersion = result['message']??'';
+      // }
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -92,8 +112,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          children: [
+            Center(
+              child: Text('Running on: $_platformVersion\n'),
+            ),
+            TextButton(onPressed: onTest, child: const Text('测试点击'))
+          ],
         ),
       ),
     );

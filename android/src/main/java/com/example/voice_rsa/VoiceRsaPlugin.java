@@ -8,10 +8,17 @@ import androidx.annotation.NonNull;
 import com.baidu.speech.EventListener;
 import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
+import com.baidu.speech.asr.SpeechConstant;
 import com.example.voice_rsa.core.recog.MyRecognizer;
+import com.example.voice_rsa.core.recog.RecogResult;
 import com.example.voice_rsa.core.recog.listener.IRecogListener;
 import com.example.voice_rsa.core.recog.listener.MessageStatusRecogListener;
 import com.example.voice_rsa.core.recog.listener.RecogEventAdapter;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -28,6 +35,9 @@ public class VoiceRsaPlugin implements FlutterPlugin, MethodCallHandler {
   private MethodChannel channel;
 
   private EventManager asr;
+
+  private Result result;
+  private String recognitionResult = "";
 
 
 
@@ -48,6 +58,34 @@ public class VoiceRsaPlugin implements FlutterPlugin, MethodCallHandler {
         String currentJson = params;
         String logMessage = "name:" + name + "; params:" + params;
         System.out.println(logMessage);
+//        result.success(currentJson);
+        if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_FINISH)) {
+          // 识别结束
+          RecogResult recogResult = RecogResult.parseJson(params);
+          System.out.println(recogResult);
+          if (recogResult.hasError()) {
+            int errorCode = recogResult.getError();
+            int subErrorCode = recogResult.getSubError();
+//            listener.onAsrFinishError(errorCode, subErrorCode, recogResult.getDesc(), recogResult);
+            Map<String, Object> res = new HashMap<>();
+            res.put("code",1);
+            res.put("message",recogResult.getDesc());
+            result.success(res);
+          } else {
+            Map<String, Object> res = new HashMap<>();
+            res.put("code",0);
+            res.put("message",recognitionResult);
+            result.success(res);
+          }
+        } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL)) {
+          try {
+            JSONObject jsonObject = new JSONObject(currentJson);
+            String bestResult = jsonObject.getString("best_result");
+            recognitionResult = bestResult;
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
       }
     });
 
@@ -64,7 +102,20 @@ public class VoiceRsaPlugin implements FlutterPlugin, MethodCallHandler {
 
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
-    } else {
+    } else if(call.method.equals("getVoiceAsr")){
+      // SDK集成步骤 拼接识别参数
+      Map<String, Object> params = new HashMap<>();
+      Map args = call.arguments();
+      params.put(SpeechConstant.APP_ID, args.get(SpeechConstant.APP_ID));
+      params.put(SpeechConstant.APP_KEY, args.get(SpeechConstant.APP_KEY));
+      params.put(SpeechConstant.SECRET, args.get(SpeechConstant.SECRET));
+      params.put(SpeechConstant.IN_FILE, args.get(SpeechConstant.IN_FILE));
+      params.put(SpeechConstant.PID, 1737);
+      params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME, false);
+      String json = new JSONObject(params).toString();
+      asr.send(SpeechConstant.ASR_START, json, null, 0, 0);
+      this.result = result;
+    }else {
       result.notImplemented();
     }
   }

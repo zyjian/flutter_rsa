@@ -9,8 +9,8 @@ class VoiceRsa {
     return VoiceRsaPlatform.instance.getPlatformVersion();
   }
 
-  Future<Map<String, dynamic>?> getVoiceAsr(String path) {
-    return VoiceRsaPlatform.instance.getVoiceAsr(path);
+  Future<Map<String, dynamic>?> getVoiceAsr(String path,{Map<String,dynamic>? params}) {
+    return VoiceRsaPlatform.instance.getVoiceAsr(path,params: params);
   }
   Future<bool?> getSpeechRecognitionAuthorized() {
     return VoiceRsaPlatform.instance.getSpeechRecognitionAuthorized();

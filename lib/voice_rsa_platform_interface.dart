@@ -23,7 +23,7 @@ abstract class VoiceRsaPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<Map<String, dynamic>?> getVoiceAsr(String path) {
+  Future<Map<String, dynamic>?> getVoiceAsr(String path,{Map<String,dynamic>? params}) {
     throw UnimplementedError('getVoiceAsr() has not been implemented.');
   }
 
