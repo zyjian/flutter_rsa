@@ -61,9 +61,9 @@ class _MyAppState extends State<MyApp> {
       //     await _voiceRsaPlugin.getPlatformVersion();
       var result =
       await _voiceRsaPlugin.getVoiceAsr(cacheFilePath,params: {
-        'appid':'8747719',
-        'key':'H4DeZw1Pim1xzfAhMOXwf5ex7ZcGjO96',
-        'secret':'jbeEKNLGN8C4NllfKGCYpzKHCVVGo2GY',
+        'appid': 'baiduAppId',
+        'key': 'baiduKey',
+        'secret': 'baiduSecret',
         'infile':cacheFilePath,
       });
       print(result);
