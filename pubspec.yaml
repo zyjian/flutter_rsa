@@ -1,7 +1,8 @@
 name: voice_rsa
-description: "A new Flutter project."
-version: 0.0.1
-homepage:
+description: "flutter 语音识别  (语音转文本) （英语）"
+version: 0.0.2
+homepage: https://github.com/zyjian
+repository: https://github.com/zyjian/flutter_rsa
 
 environment:
   sdk: '>=3.3.1 <4.0.0'

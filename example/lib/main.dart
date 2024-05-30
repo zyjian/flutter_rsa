@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:voice_rsa/rsa_authorization.dart';
 import 'package:voice_rsa/voice_rsa.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
@@ -22,13 +23,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  final _voiceRsaPlugin = VoiceRsa();
+  final voiceRsaPlugin = VoiceRsa();
 
   @override
   void initState() {
     super.initState();
-    saveFileFromAssetsToCache('assets/test.pcm');
 
+    saveFileFromAssetsToCache('assets/test.${Platform.isAndroid?'pcm':'mp3'}');
+  }
+
+
+  Future<String> localPath() async {
+    Directory cacheDir = await getTemporaryDirectory();
+    String cacheFilePath = '${cacheDir.path}/test.${Platform.isAndroid?'pcm':'mp3'}';
+    return cacheFilePath;
   }
 
   Future<void> saveFileFromAssetsToCache(String assetFileName) async {
@@ -37,8 +45,7 @@ class _MyAppState extends State<MyApp> {
     List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     // Get cache directory
     Directory cacheDir = await getTemporaryDirectory();
-    String cacheFilePath = '${cacheDir.path}/test.pcm';
-    // Write file to cache directory
+    String cacheFilePath = await localPath();
     var file = await File(cacheFilePath).writeAsBytes(bytes);
     print(file);
     print('File saved to cache: $cacheFilePath');
@@ -53,57 +60,68 @@ class _MyAppState extends State<MyApp> {
     }
   }
   void onTest() async{
-    await requestPermission();
-    try {
-      Directory cacheDir = await getTemporaryDirectory();
-      String cacheFilePath = '${cacheDir.path}/test.pcm';
-      // var result =
-      //     await _voiceRsaPlugin.getPlatformVersion();
-      var result =
-      await _voiceRsaPlugin.getVoiceAsr(cacheFilePath,params: {
+    if(Platform.isAndroid){
+
+      await requestPermission();
+      String cacheFilePath = await localPath();
+      //path 是pcm 格式文件，路径是全路径  baiduAppId相关 百度识别后台查看
+      var result = await voiceRsaPlugin.getVoiceAsr('', params: {
         'appid': 'baiduAppId',
         'key': 'baiduKey',
         'secret': 'baiduSecret',
-        'infile':cacheFilePath,
+        'infile': cacheFilePath,
       });
-      print(result);
-    } catch(e) {
-      print(e);
-    }
-  }
-
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion = '';
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      var isAuthorized = await _voiceRsaPlugin.getSpeechRecognitionAuthorized();
-      print(isAuthorized);
-      if(isAuthorized==false){
-        var result = await _voiceRsaPlugin.requestAuthorization();
-        print(result);
+      if (result != null) {
+        if (result['code'] == 0) {//识别正确的结果
+          var message = result['message'] ?? '';
+        } else {
+          // 异常识别
+          if (result['message'] == "No speech detected") {
+            result['message'] = "未检测到语音";
+          }
+          throw result['message'] ?? '识别异常';
+        }
+      } else {
+        throw '识别异常';
       }
 
-      // var result =
-      //     await _voiceRsaPlugin.getVoiceAsr(audioPath);
-      // if(result != null){
-      //   platformVersion = result['message']??'';
-      // }
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+    }else{
+      //ios 校验全选
+      var requestResult = await voiceRsaPlugin.requestAuthorization();
+      switch (requestResult) {
+        case RsaAuthorization.agree:
+          break;
+        case RsaAuthorization.disagree:
+          // ToastUtils.show('请在设置中同意语音识别权限');
+          return;
+        case RsaAuthorization.unAvailable:
+          // ToastUtils.show('该设备不支持语音识别');
+          return;
+        case RsaAuthorization.unknown:
+          // ToastUtils.show('语音识别权限未知');
+          return;
+      }
+
+
+      String cacheFilePath = await localPath();
+      var result = await voiceRsaPlugin.getVoiceAsr(cacheFilePath);
+      if (result != null) {
+        if (result['code'] == 0) {//识别正确的结果
+          var message = result['message'] ?? '';
+        } else {
+          // 异常识别
+          if (result['message'] == "No speech detected") {
+            result['message'] = "未检测到语音";
+          }
+          throw result['message'] ?? '识别异常';
+        }
+      } else {
+        throw '识别异常';
+      }
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
+
 
   @override
   Widget build(BuildContext context) {
