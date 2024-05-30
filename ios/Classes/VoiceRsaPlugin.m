@@ -14,8 +14,7 @@
     NSLog(@"%@ %@",call.arguments,call.method);
   if ([@"getVoiceAsr" isEqualToString:call.method]) {
       NSString *path = call.arguments[@"path"];
-      NSURL *localURL = [[self documentsDirectoryURL] URLByAppendingPathComponent:path];
-      NSLog(@"%@",[self documentsDirectoryURL]);
+      NSURL *localURL = [NSURL fileURLWithPath:path];
       [self recognizeSpeechFromURL:localURL completion:^(NSString *transcription, NSError *error) {
           if (error) {
               NSLog(@"There was an error: %@", error);
@@ -63,9 +62,6 @@
 - (BOOL)isSpeechRecognitionAuthorized {
     SFSpeechRecognizerAuthorizationStatus status = [SFSpeechRecognizer authorizationStatus];
     return status == SFSpeechRecognizerAuthorizationStatusAuthorized;
-}
-- (NSURL *)documentsDirectoryURL {
-    return [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
 }
 
 - (void)recognizeSpeechFromURL:(NSURL *)url completion:(void (^)(NSString *, NSError *))completion {
