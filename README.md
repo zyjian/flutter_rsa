@@ -1,4 +1,4 @@
-# flutter_asr 语音文件识别 插件
+# voice_rsa 语音文件识别 插件
 
 flutter 语音文件 识别  (语音转文本) （英语）
 - Android 端采用百度语音识别sdk（百度收费）
@@ -10,11 +10,17 @@ flutter 语音文件 识别  (语音转文本) （英语）
 
 
 ## 配置
-### Android
+### Android 
+Manifest 配置
 1. 需要添加权限
 ```
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 ```
+2. 重要重要重要 项目中而配置 在 Android 应用的 Manifest 文件中设置的属性，它位于 <application> 标签内。这个设置告诉 Android 系统是否需要在安装时解压你的应用的原生库 (.so 文件)。
+``` 
+android:extractNativeLibs="true"
+```
+
 示例
 ```
 //百度识别需要录音权限 虽然是文件识别也需要否则报错

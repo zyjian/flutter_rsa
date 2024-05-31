@@ -1,6 +1,6 @@
 name: voice_rsa
 description: "flutter 语音识别  (语音转文本) （英语）"
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/zyjian
 repository: https://github.com/zyjian/flutter_rsa
 
